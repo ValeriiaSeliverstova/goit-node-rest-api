@@ -1,55 +1,37 @@
-import fs from "fs/promises";
-import path from "path";
-import { nanoid } from "nanoid";
+import Contact from "../db/models/contact.js";
 
-const contactsPath = path.resolve("db", "contacts.json");
-
-export async function listContacts() {
-  const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
+export function listContacts() {
+  const data = Contact.findAll();
+  return data;
 }
 
-export async function writeContacts(contacts) {
-  return await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-}
+export const getContactById = (contactId) => Contact.findByPk(contactId);
 
-export async function getContactById(contactId) {
-  const contacts = await listContacts();
-  const contact = contacts.find((c) => c.id === contactId);
-  return contact || null;
-}
-
-export async function removeContact(contactId) {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((c) => c.id === contactId);
-  if (index === -1) {
+export const removeContact = async (contactId) => {
+  const contact = await getContactById(contactId); //this object is linked to entity in the database
+  if (!contact) {
     return null;
   }
-  const [result] = contacts.splice(index, 1);
-  await writeContacts(contacts);
-  return result;
-}
+  await contact.destroy(); //updates entity in the database
+  return contact;
+};
 
-export async function addContact(args) {
-  const contacts = await listContacts();
-  const newContact = {
-    id: nanoid(),
-    ...args,
-  };
+export const addContact = (payload) => Contact.create(payload);
 
-  contacts.push(newContact);
-  await writeContacts(contacts);
-  return newContact;
-}
-
-export async function updateContact(contactId, args) {
-  const contacts = await listContacts();
-  const index = contacts.findIndex((c) => c.id === contactId);
-  if (index === -1) {
+export const updateContact = async (contactId, payload) => {
+  const contact = await getContactById(contactId); //this object is linked to entity in the database
+  if (!contact) {
     return null;
   }
+  await contact.update(payload); //updates entity in the database
+  return contact;
+};
 
-  contacts[index] = { ...contacts[index], ...args };
-  await writeContacts(contacts);
-  return contacts[index];
-}
+export const updateFavoriteContact = async (contactId, payload) => {
+  const contact = await getContactById(contactId); //this object is linked to entity in the database
+  if (!contact) {
+    return null;
+  }
+  await contact.update(payload); //updates entity in the database
+  return contact;
+};
