@@ -41,3 +41,17 @@ export const updateContact = async (req, res) => {
 
   res.json(updatedContact);
 };
+
+export const updateFavoriteContact = async (req, res) => {
+  const { id } = req.params;
+
+  const updatedFavoriteContact = await contactsService.updateFavoriteContact(
+    id,
+    req.body
+  );
+  if (!updatedFavoriteContact) {
+    throw HttpError(404, `Contact with id=${id} not found`);
+  }
+
+  res.json(updatedFavoriteContact);
+};
