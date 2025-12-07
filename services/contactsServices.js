@@ -1,14 +1,15 @@
-import Contact from "../db/models/contact.js";
+import Contact from "../db/models/Contact.js";
 
-export function listContacts() {
-  const data = Contact.findAll();
-  return data;
-}
+export const listContacts = (owner) => {
+  return Contact.findAll({ where: { owner } });
+};
 
-export const getContactById = (contactId) => Contact.findByPk(contactId);
+export const getContact = (payload) => {
+  return Contact.findOne({ where: payload });
+};
 
-export const removeContact = async (contactId) => {
-  const contact = await getContactById(contactId); //this object is linked to entity in the database
+export const removeContact = async (payload) => {
+  const contact = await getContact(payload); //this object is linked to entity in the database
   if (!contact) {
     return null;
   }
@@ -18,8 +19,8 @@ export const removeContact = async (contactId) => {
 
 export const addContact = (payload) => Contact.create(payload);
 
-export const updateContact = async (contactId, payload) => {
-  const contact = await getContactById(contactId); //this object is linked to entity in the database
+export const updateContact = async (id, owner, payload) => {
+  const contact = await getContact({ id, owner }); //this object is linked to entity in the database
   if (!contact) {
     return null;
   }
@@ -27,8 +28,8 @@ export const updateContact = async (contactId, payload) => {
   return contact;
 };
 
-export const updateFavoriteContact = async (contactId, payload) => {
-  const contact = await getContactById(contactId); //this object is linked to entity in the database
+export const updateFavoriteContact = async (id, owner, payload) => {
+  const contact = await getContact({ id, owner }); //this object is linked to entity in the database
   if (!contact) {
     return null;
   }
