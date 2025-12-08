@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   refreshUser,
+  updateAvatar,
 } from "../services/authServices.js";
 
 export const registerController = async (req, res) => {
@@ -28,4 +29,9 @@ export const getCurrentUserController = async (req, res) => {
 export const logoutController = async (req, res) => {
   await logoutUser(req.user);
   res.status(204).send();
+};
+
+export const updateAvatarController = async (req, res) => {
+  await updateAvatar(req.user, req.file);
+  res.status(200).json({ avatarURL: req.user.avatarURL });
 };

@@ -2,14 +2,19 @@ import User from "../db//models/User.js";
 import bcrypt from "bcrypt";
 import HttpError from "../helpers/HttpError.js";
 import { createToken } from "../helpers/jwt.js";
+import * as fs from "node:fs/promises";
+import path from "node:path";
+import createAvatar from "../helpers/createAvatar.js";
+
+const avatarsDir = path.resolve("public", "avatars");
 
 export const findUser = (where) => User.findOne({ where });
 
 export const registerUser = async (payload) => {
+  const avatarURL = createAvatar(payload.email);
   const hashedPassword = await bcrypt.hash(payload.password, 10);
-  console.log(hashedPassword);
 
-  return User.create({ ...payload, password: hashedPassword });
+  return User.create({ ...payload, password: hashedPassword, avatarURL });
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -51,4 +56,15 @@ export const refreshUser = async (user) => {
 
 export const logoutUser = async (user) => {
   await user.update({ token: null });
+};
+
+export const updateAvatar = async (user, file) => {
+  let avatar = null;
+  if (file) {
+    const newPath = path.join(avatarsDir, file.filename);
+    await fs.rename(file.path, newPath);
+    avatar = path.join("public", "avatars", file.filename);
+  }
+
+  return user.update({ avatarURL: avatar });
 };

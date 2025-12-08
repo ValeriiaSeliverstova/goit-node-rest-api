@@ -6,7 +6,9 @@ import {
   loginController,
   getCurrentUserController,
   logoutController,
+  updateAvatarController,
 } from "../controllers/authControllers.js";
+import upload from "../middlewares/upload.js";
 
 import authenticate from "../middlewares/authenticate.js";
 
@@ -19,5 +21,12 @@ authRouter.post("/login", validateBody(loginSchema), loginController);
 authRouter.post("/logout", authenticate, logoutController);
 
 authRouter.get("/current", authenticate, getCurrentUserController);
+
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"),
+  updateAvatarController
+);
 
 export default authRouter;
