@@ -1,6 +1,8 @@
 import { createToken } from "../helpers/jwt.js";
 import {
   registerUser,
+  verifyUserEmail,
+  resendVerifyEmail,
   loginUser,
   logoutUser,
   refreshUser,
@@ -14,6 +16,17 @@ export const registerController = async (req, res) => {
     email: newUser.email,
     subscription: "starter",
   });
+};
+
+export const verifyEmailController = async (req, res) => {
+  const { verificationToken } = req.params;
+  await verifyUserEmail(verificationToken);
+  res.status(200).json({ message: "Email successfully verified" });
+};
+
+export const resendVerifyEmailController = async (req, res) => {
+  await resendVerifyEmail(req.body);
+  res.status(200).json({ message: "Verification email sent again" });
 };
 
 export const loginController = async (req, res) => {
